@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elimine sua Demência</title>
+    <style>
+        :root {
+            --bg-color: #0a0a12;
+            --text-color: #c0c0c0;
+            /* Cores do Cérebro Realista */
+            --brain-base: #dba4a4;
+            --brain-shadow: #a35f5f;
+            --brain-deep-shadow: #7a3e3e;
+            --brain-highlight: #f2cccc;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* --- NOVOS TÍTULOS DRAMÁTICOS --- */
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ff4d4d; /* Vermelho dramático */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+        }
+
+        .sub-title {
+            font-size: 1.4rem;
+            color: #aaaaaa;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+
+        #status-panel {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 25px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #bact-count {
+            font-weight: bold;
+            color: #50fa7b;
+            font-family: monospace;
+            font-size: 1.3em;
+        }
+
+        /* --- O CÉREBRO REALISTA E SIMÉTRICO --- */
+        #brain-container {
+            position: relative;
+            width: 90vw;
+            max-width: 600px;
+            height: 480px;
+            
+            /* Forma SIMÉTRICA e mais definida (visão superior) */
+            border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+            
+            background-color: var(--brain-base);
+            
+            /* Texturas melhoradas com SVG e gradientes para realismo de sulcos e giros */
+            background-image: 
+                /* Brilho central */
+                radial-gradient(circle at 50% 30%, var(--brain-highlight) 0%, transparent 50%),
+                /* Divisão central (o sulco entre hemisférios) */
+                linear-gradient(to bottom, transparent 10%, var(--brain-deep-shadow) 50%, transparent 90%),
+                /* Padrões de textura SVG (sulcos) */
+                url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><path d="M0 100 Q 50 150, 100 100 T 200 100" stroke="%237a3e3e" fill="none" stroke-width="12" opacity="0.4"/></svg>'),
+                url('data:image/svg+xml;utf8,<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><path d="M0 75 Q 35 120, 75 75 T 150 75" stroke="%23a35f5f" fill="none" stroke-width="8" opacity="0.5"/></svg>'),
+                /* Gradiente base para volume */
+                radial-gradient(circle at center, var(--brain-base) 40%, var(--brain-deep-shadow) 100%);
+            
+            background-size: 100% 100%, 4px 100%, 300px 300px, 250px 250px, 100% 100%;
+            background-position: center, center, 0 0, 0 0, center;
+
+            
+            border: 5px solid var(--brain-deep-shadow);
+            box-shadow: 
+                inset 0 0 60px rgba(0,0,0,0.5), 
+                0 25px 50px rgba(0,0,0,0.6); 
+            
+            overflow: hidden;
+            /* Animação sutil de pulsação */
+            animation: pulse-organ 6s ease-in-out infinite alternate;
+            cursor: crosshair;
+        }
+
+        /* Camada de brilho úmido/viscoso */
+        #brain-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            background: linear-gradient(160deg, rgba(255,255,255,0.4) 0%, transparent 60%);
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        @keyframes pulse-organ {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.015); }
+        }
+
+        /* --- AS BACTÉRIAS FLAGELADAS --- */
+        .bacterium-container {
+            position: absolute;
+            width: 40px; height: 15px;
+            transform-origin: center center;
+            will-change: transform, left, top;
+            padding: 10px; margin: -10px; /* Hitbox maior para facilitar o clique */
+        }
+        /* Cabeça ovalada */
+        .bact-head {
+            position: absolute; left: 20px; top: 2px; width: 16px; height: 11px;
+            background: radial-gradient(circle at 40% 40%, #c0e97a, #488513);
+            border-radius: 50% 70% 70% 50%; border: 1px solid #2e5a0b; z-index: 2;
+        }
+        /* Cauda SVG com animação de natação */
+        .bact-tail {
+            position: absolute; left: 0; top: 0; width: 25px; height: 15px; z-index: 1;
+            animation: flagellum-whip 0.3s linear infinite alternate; transform-origin: 100% 50%;
+        }
+        .bact-tail path {
+            fill: none; stroke: #6fa832; stroke-width: 2; stroke-linecap: round;
+        }
+        @keyframes flagellum-whip {
+            0% { transform: scaleY(1) skewY(0deg); }
+            100% { transform: scaleY(1) skewY(-15deg); }
+        }
+        /* Estado de morte ao clicar */
+        .bacterium-container.dead {
+            pointer-events: none; transition: transform 0.3s, opacity 0.3s; opacity: 0;
+            transform: scale(1.5) !important;
+        }
+        .bacterium-container.dead .bact-head { background: #ff3333; border-color: #800000; }
+         .bacterium-container.dead .bact-tail path { stroke: #ff3333; }
+
+
+        #victory-message {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2.5em; color: #50fa7b; text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            z-index: 10; font-weight: bold; text-transform: uppercase;
+        }
+
+        /* Responsividade para títulos em telas pequenas */
+        @media (max-width: 600px) {
+            .main-title { font-size: 2.2rem; }
+            .sub-title { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="main-title">Elimine sua Demência!</h1>
+    <p class="sub-title">mate as bactérias do seu cérebro</p>
+
+    <div id="status-panel">
+        Ameaças Restantes: <span id="bact-count">0</span>
+    </div>
+
+    <div id="brain-container">
+        <div id="victory-message">Cérebro Salvo!</div>
+    </div>
+
+
+    <script>
+        const brainContainer = document.getElementById('brain-container');
+        const countDisplay = document.getElementById('bact-count');
+        const victoryMessage = document.getElementById('victory-message');
+        
+        let bacteriaElements = [];
+        const TOTAL_BACTERIA = 40;
+        let remainingBacteria = TOTAL_BACTERIA;
+        let animationId;
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Função para criar a bactéria flagelada (cabeça div + cauda SVG)
+        function createBacterium() {
+            const container = document.createElement('div');
+            container.classList.add('bacterium-container');
+            
+            const head = document.createElement('div');
+            head.classList.add('bact-head');
+            
+            // SVG para a cauda
+            const tailSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            tailSvg.classList.add('bact-tail');
+            tailSvg.setAttribute('viewBox', '0 0 25 15');
+            const tailPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tailPath.setAttribute('d', 'M0,7.5 Q 6,0 12,7.5 T 24,7.5');
+            tailSvg.appendChild(tailPath);
+            
+            container.appendChild(tailSvg);
+            container.appendChild(head);
+
+            // Posição inicial aleatória dentro de margens seguras
+            let x = random(70, brainContainer.offsetWidth - 80);
+            let y = random(70, brainContainer.offsetHeight - 80);
+            container.style.left = `${x}px`;
+            container.style.top = `${y}px`;
+
+            // Velocidade e ângulo iniciais
+            let speed = random(1.5, 3.5);
+            let angle = random(0, Math.PI * 2);
+            container.dx = Math.cos(angle) * speed;
+            container.dy = Math.sin(angle) * speed;
+
+            // Gerenciador de clique/toque para matar a bactéria
+            const handleInteraction = (e) => {
+                e.preventDefault(); e.stopPropagation(); killBacterium(container);
+            };
+            container.addEventListener('mousedown', handleInteraction);
+            container.addEventListener('touchstart', handleInteraction, {passive: false});
+
+            brainContainer.appendChild(container);
+            bacteriaElements.push(container);
+        }
+
+        // Função para eliminar a bactéria
+        function killBacterium(element) {
+            if (element.classList.contains('dead')) return;
+            element.classList.add('dead');
+            remainingBacteria--;
+            updateScore();
+            // Remove do DOM após a animação de morte
+            setTimeout(() => {
+                element.remove();
+                bacteriaElements = bacteriaElements.filter(b => b !== element);
+            }, 300);
+        }
+
+        // Atualiza o placar e verifica vitória
+        function updateScore() {
+            countDisplay.innerText = remainingBacteria;
+            if (remainingBacteria <= 0) {
+                victoryMessage.style.display = 'block';
+                // Efeito visual de "cura" no cérebro ao vencer
+                brainContainer.style.filter = "saturate(0.5) brightness(1.2)";
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        // Loop de animação principal
+        function animate() {
+            const bounds = brainContainer.getBoundingClientRect();
+            const margin = 35; // Margem para colisão com as bordas
+            
+            bacteriaElements.forEach(bact => {
+                if (bact.classList.contains('dead')) return;
+                let currentLeft = parseFloat(bact.style.left);
+                let currentTop = parseFloat(bact.style.top);
+
+                // Colisão simples com as bordas do container
+                if (currentLeft <= margin || currentLeft >= bounds.width - margin) bact.dx *= -1;
+                if (currentTop <= margin || currentTop >= bounds.height - margin) bact.dy *= -1;
+
+                // Adiciona movimento aleatório (browniano)
+                bact.dx += random(-0.2, 0.2);
+                bact.dy += random(-0.2, 0.2);
+                // Limita velocidade máxima
+                const maxSpeed = 4;
+                bact.dx = Math.max(Math.min(bact.dx, maxSpeed), -maxSpeed);
+                bact.dy = Math.max(Math.min(bact.dy, maxSpeed), -maxSpeed);
+
+                let newX = currentLeft + bact.dx;
+                let newY = currentTop + bact.dy;
+                
+                // Calcula a rotação para a bactéria "olhar" para onde está indo
+                let targetRotation = Math.atan2(bact.dy, bact.dx) * (180 / Math.PI);
+                
+                bact.style.left = `${newX}px`;
+                bact.style.top = `${newY}px`;
+                bact.style.transform = `rotate(${targetRotation}deg)`;
+            });
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Inicialização
+        window.onload = function() {
+            for (let i = 0; i < TOTAL_BACTERIA; i++) createBacterium();
+            updateScore();
+            animate();
+        };
+    </script>
+</body>
+</html>
