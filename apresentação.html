@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATISTA_SYSTEM_V1.0</title>
+    <style>
+        /* RESET E FUNDO MATRIX */
+        body {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #000;
+            color: #00FF00; /* Verde Neon clássico */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* TEXTO CORRENDO (MARQUEE ESTILIZADO) */
+        .top-bar {
+            background-color: #00FF00;
+            color: #000;
+            width: 100%;
+            font-weight: bold;
+            padding: 5px 0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border: 2px solid #00AA00;
+        }
+
+        /* CONTAINER PRINCIPAL ESTILO WINDOWS ANTIGO */
+        .window {
+            background-color: #001100;
+            border: 4px outset #00FF00; /* Borda 3D */
+            box-shadow: 8px 8px 0px #004400;
+            max-width: 800px;
+            width: 90%;
+            padding: 0;
+        }
+
+        .window-header {
+            background: linear-gradient(90deg, #004400, #00FF00);
+            color: #000;
+            padding: 5px 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #00FF00;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            text-shadow: 2px 2px #005500;
+            border-bottom: 1px dashed #00FF00;
+        }
+
+        .bio-section {
+            border: 1px solid #00FF00;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #000800;
+        }
+
+        /* DESTAQUES */
+        .tag {
+            background-color: #00FF00;
+            color: #000;
+            padding: 0 4px;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+
+        .highlight-blue {
+            color: #00FFFF;
+            font-weight: bold;
+        }
+
+        /* LISTAS E INTERESSES */
+        ul {
+            list-style: "[>>] ";
+            line-height: 1.6;
+        }
+
+        .grid-interests {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .box {
+            border: 2px inset #00FF00;
+            padding: 10px;
+        }
+
+        /* RODAPÉ E CONTADOR */
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #008800;
+        }
+
+        .loading-bar {
+            width: 100%;
+            border: 1px solid #00FF00;
+            height: 20px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress {
+            width: 65%; /* Progresso do seu aprendizado */
+            background-color: #00FF00;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <marquee scrollamount="10">INICIANDO TRANSIÇÃO PARA TECH... STATUS: ESTUDANDO DESENVOLVIMENTO WEB... FOCO NO CÓDIGO...</marquee>
+    </div>
+
+    <div class="window">
+        <div class="window-header">
+            <span>PERFIL_USUARIO.EXE</span>
+            <span>[ _ ] [ X ]</span>
+        </div>
+        
+        <div class="content">
+            <h1>Olá, eu sou o Agnaldo!</h1>
+            
+            <div class="bio-section">
+                <p>> <b>ID:</b> Agnaldo Batista da Silva</p>
+                <p>> <b>IDADE:</b> 23 anos</p>
+                <p>> <b>EXPERIÊNCIA:</b> Atuei por um bom tempo como <span class="tag">Editor de Vídeos</span></p>
+                <p>> <b>MISSÃO ATUAL:</b> Migrando para o mundo da programação e <span class="highlight-blue">Desenvolvimento Web</span>.</p>
+            </div>
+
+            <p>Seja bem-vindo ao meu log de estudos. Este repositório é onde guardo cada passo da minha evolução, desde o HTML básico até sistemas complexos.</p>
+
+            <div class="grid-interests">
+                <div class="box">
+                    <h3 style="color: #FFFF00;">[ MATEMÁTICA ]</h3>
+                    <p>Focado em construir uma base sólida para computação e desafios lógicos.</p>
+                </div>
+                <div class="box">
+                    <h3 style="color: #FFFF00;">[ GEOPOLÍTICA ]</h3>
+                    <p>Interesse profundo em análise internacional e tendências globais.</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px;">HABILIDADES EM CARREGAMENTO:</h3>
+            <ul>
+                <li>Lógica de Programação</li>
+                <li>Estrutura de Dados em HTML5</li>
+                <li>Estilização CSS Estilo Anos 2000</li>
+                <li>Controle de Versão (Git/GitHub)</li>
+            </ul>
+
+            <div class="loading-bar">
+                <div class="progress"></div>
+            </div>
+            <p style="font-size: 0.7em; text-align: center;">CARREGANDO CONHECIMENTO: 65%</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>CONSTRUÍDO EM 2025 - OPTIMIZADO PARA HUMANOS E MÁQUINAS</p>
+        <p>REPOSITÓRIO DE ESTUDOS WEB - AGNALDO BATISTA</p>
+    </footer>
+
+</body>
+</html>
