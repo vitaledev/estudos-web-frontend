@@ -1,5 +1,3 @@
-# estudos-web-frontend
-Repositório para armazenar meus exercícios de HTML, CSS e lógica de programação.
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
