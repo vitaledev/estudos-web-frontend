@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervo de Relações Internacionais - UNIP</title>
+    <style>
+        /* --- VARIÁVEIS GLOBAIS E TEMA --- */
+        :root {
+            --deep-blue: #0a2342;    /* Azul Oceano Profundo */
+            --diplomatic-blue: #1c3a5e; /* Azul Institucional */
+            --gold-accent: #d4af37;  /* Dourado Metálico */
+            --gold-light: #f3e5ab;   /* Dourado Pálido para texto */
+            --bg-dark: #121212;      /* Fundo muito escuro */
+            --text-light: #e0e0e0;   /* Texto claro */
+            --panel-bg: #1e2a38;     /* Fundo dos painéis */
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1a2a40 0%, #000000 100%);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- CABEÇALHO IMERSIVO TEMA GLOBO --- */
+        header {
+            background: radial-gradient(ellipse at bottom, var(--diplomatic-blue) 0%, var(--deep-blue) 60%, #000000 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--gold-accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(212, 175, 55, 0.05) 50px, rgba(212, 175, 55, 0.05) 51px),
+                              repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(212, 175, 55, 0.05) 50px, rgba(212, 175, 55, 0.05) 51px);
+            pointer-events: none;
+        }
+
+        .header-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8rem;
+            font-family: 'Georgia', serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--gold-accent);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--gold-light);
+            margin-top: 5px;
+            font-weight: 300;
+        }
+
+        header p.description {
+            max-width: 700px;
+            margin: 25px auto 0;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+            font-size: 1rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            padding-top: 20px;
+        }
+
+        /* --- CONTAINER PRINCIPAL --- */
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        /* --- BOTÕES ACORDEÃO (ESTILO DOSSIÊ) --- */
+        .semester-btn {
+            background: linear-gradient(145deg, var(--diplomatic-blue), var(--deep-blue));
+            color: var(--gold-light);
+            cursor: pointer;
+            padding: 22px 25px;
+            width: 100%;
+            border: none;
+            border-left: 6px solid var(--gold-accent);
+            text-align: left;
+            outline: none;
+            font-size: 1.3rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-radius: 4px;
+        }
+
+        .semester-btn:hover {
+            background: linear-gradient(145deg, var(--gold-accent), #b3932a);
+            color: var(--deep-blue);
+            transform: translateX(5px);
+        }
+
+        .semester-btn.active {
+            background: var(--gold-accent);
+            color: var(--deep-blue);
+            border-left: 6px solid white;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .semester-btn::before {
+            content: '🌐 '; 
+            margin-right: 10px;
+            filter: grayscale(100%) brightness(200%);
+        }
+        .semester-btn:hover::before, .semester-btn.active::before {
+             filter: none;
+        }
+
+        .semester-btn:after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--gold-accent);
+            transition: transform 0.3s ease;
+        }
+
+        .semester-btn.active:after {
+            transform: rotate(180deg);
+            color: var(--deep-blue);
+        }
+
+        /* --- PAINEL DE CONTEÚDO --- */
+        .panel {
+            padding: 0 20px;
+            background-color: var(--panel-bg);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            margin-bottom: 15px;
+            border-radius: 0 0 4px 4px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .subject-list {
+            list-style-type: none;
+            padding: 25px 5px;
+            margin: 0;
+        }
+
+        .subject-item {
+            margin-bottom: 12px;
+        }
+
+        /* --- LINKS DAS MATÉRIAS --- */
+        .subject-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 6px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .subject-link:hover {
+            background-color: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-accent);
+            color: var(--gold-accent);
+            transform: translateX(8px);
+        }
+
+        .icon-col {
+            font-size: 1.4rem;
+            margin-right: 15px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .text-col {
+            flex-grow: 1;
+        }
+
+        /* --- RODAPÉ --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 60px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            background-color: rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <span class="header-icon">🌍</span>
+    <h1>Geopolítica & R.I.</h1>
+    <div class="subtitle">Acervo Acadêmico Digital</div>
+    <p class="description">
+        Central de organização curricular e materiais de estudo do curso de Relações Internacionais da Universidade Paulista (UNIP). <br>
+        Navegue pelos semestres para acessar os arquivos de geopolítica, economia internacional, direito e sociedade.
+    </p>
+</header>
+
+<div class="container">
+
+    <button class="semester-btn">1º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🗿</span><span class="text-col">Antropologia e Cultura Brasileira</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🌐</span><span class="text-col">Relações Internacionais</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📝</span><span class="text-col">Interpretação e Produção de Textos</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">⚖️</span><span class="text-col">Instituições de Direito</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🕊️</span><span class="text-col">Direitos Humanos</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">💹</span><span class="text-col">Economia e Negócios</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">2º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🏙️</span><span class="text-col">Relações Inter. Contemporâneas</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1Vf5F9Cnbib9TfohafYVa7bP9bnXSP9g0?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">🗣️</span><span class="text-col">Comunicação e Expressão</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🤝🏿</span><span class="text-col">Rel. Étnico-Raciais e Afrodescendência</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📜</span><span class="text-col">Hist. das Relações Inter. do Brasil</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">💼</span><span class="text-col">Fundamentos de Administração</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/19llqJANAJyRXTwgqmnUkvJD7R-uHtFZf?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">📐</span><span class="text-col">Matemática</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">3º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚢</span><span class="text-col">Comex - Exportação e Importação</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1eDpNtjhQazkqlMMvcs_xCkqejFxMDRnP?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">🏛️</span><span class="text-col">História das Relações Internacionais</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1qFztwjlVP4rlEs6Gmo0rASN06ctaIKIj?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">👥</span><span class="text-col">Homem e Sociedade</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🗺️</span><span class="text-col">Geopolítica, Regionalismo e Integração</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🌱</span><span class="text-col">Educação Ambiental</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🗳️</span><span class="text-col">Ciência Política</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1XnIjnQ_o6olzdiGXAvhQIdQUPbF3tAun?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">4º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🧠</span><span class="text-col">Teorias das Relações Internacionais</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1SRB5IqoQTm4trClwglv5Kbh98ogZvPgV?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">⚙️</span><span class="text-col">Processos e Práticas em RI</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1FY64Kkv8M-RstDdKSdjJbO8036U5FJ3-?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">🔎</span><span class="text-col">Ciências Sociais</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🤟</span><span class="text-col">Libras (Língua Bras. de Sinais)</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🎯</span><span class="text-col">Marketing Pessoal (Optativa)</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🤔</span><span class="text-col">Filosofia e Ética</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚚</span><span class="text-col">Comex - Estudos Logísticos</span></a></li>
+            <li class="subject-item"><a href="https://drive.google.com/drive/folders/1Br_r1LaxtksFFPP_nGfgK81zSlDxwCej?usp=sharing" class="subject-link" target="_blank"><span class="icon-col">🇧🇷</span><span class="text-col">Formação Econ. do Brasil Contemporâneo</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">5º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🤝</span><span class="text-col">Diplomacia Política nas Rel. Internacionais</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📚</span><span class="text-col">Teorias Contemp. das Relações Int.</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📝</span><span class="text-col">Metodologia do Trabalho Acadêmico</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🛃</span><span class="text-col">Comex - Legislação Aduaneira e Câmbio</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📊</span><span class="text-col">Estatística</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📉</span><span class="text-col">Economia Brasil Contemporânea</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">6º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">💰</span><span class="text-col">Diplomacia Econômica nas Rel. Int.</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🌎</span><span class="text-col">Relac. Inter. na América Latina</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">⚖️</span><span class="text-col">Direito Internacional</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🔬</span><span class="text-col">Métodos de Pesquisa</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🔄</span><span class="text-col">Relações Intern. Interdisciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🏛️</span><span class="text-col">Econ. e Gestão do Setor Público</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">7º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🎓</span><span class="text-col">Trabalho de Curso: Proj. Monografia</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🧐</span><span class="text-col">Análise de Política Externa</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">💵</span><span class="text-col">Economia Internacional</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🔗</span><span class="text-col">Relações Internacionais Integ.</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📢</span><span class="text-col">Marketing Internacional</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+    <button class="semester-btn">8º Semestre</button>
+    <div class="panel">
+        <ul class="subject-list">
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📘</span><span class="text-col">Estudos Disciplinares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">➕</span><span class="text-col">Atividades Complementares</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🇧🇷</span><span class="text-col">Política Externa Brasileira</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🛡️</span><span class="text-col">Segur. Intern. e Estud. Estratégicos</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🎓</span><span class="text-col">Trabalho de Curso: Monografia</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">📈</span><span class="text-col">Desenvolvimento Socioeconômico</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">💼</span><span class="text-col">Tópicos Atuação Profissional - RI</span></a></li>
+            <li class="subject-item"><a href="#" class="subject-link" target="_blank"><span class="icon-col">🚩</span><span class="text-col">Atividades Práticas Supervisionadas</span></a></li>
+        </ul>
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2025 Agnaldo Batista da Silva Filho - Universidade Paulista (UNIP)
+</footer>
+
+<script>
+    var acc = document.getElementsByClassName("semester-btn");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } 
+        });
+    }
+</script>
+
+</body>
+</html>
