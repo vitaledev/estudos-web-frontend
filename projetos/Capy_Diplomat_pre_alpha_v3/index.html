@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Capivara Sushi: Ultimate Shield</title>
+    <style>
+        /* --- ESTILOS VISUAIS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Fredoka:wght@400;700&display=swap');
+
+        body {
+            margin: 0; padding: 0;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            color: white;
+            font-family: 'Fredoka', sans-serif;
+            overflow: hidden; 
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw; 
+            touch-action: none; user-select: none;
+        }
+
+        #game-wrapper {
+            position: relative;
+            background: #000;
+            box-shadow: 0 0 80px rgba(0,0,0,0.9), 0 0 0 8px #333;
+            border-radius: 16px;
+            overflow: hidden;
+            width: 90vw; height: 50.625vw; 
+            max-width: 177.78vh; max-height: 90vh;
+            transition: all 0.3s;
+        }
+
+        body.fullscreen #game-wrapper {
+            width: 100vw !important; height: 100vh !important;
+            max-width: none !important; max-height: none !important;
+            border: none; border-radius: 0;
+            box-shadow: none;
+        }
+
+        /* AJUSTES MOBILE ESPECÍFICOS */
+        @media (max-width: 768px) {
+            #game-wrapper { 
+                width: 100vw; height: 100vh; 
+                max-width: none; max-height: none; 
+                border: none; border-radius: 0; 
+            }
+            
+            /* Ajuste dos ícones no topo direito */
+            .icon-btn-container { top: 10px !important; right: 10px !important; gap: 8px !important; }
+            .icon-btn { width: 35px !important; height: 35px !important; font-size: 18px !important; }
+            
+            /* Placar menor */
+            #score-container { top: 10px !important; left: 15px !important; }
+            #score-label { font-size: 10px !important; }
+            #score-display { font-size: 30px !important; }
+            #combo-bar-container { width: 100px !important; height: 6px !important; }
+            #combo-text { font-size: 10px !important; }
+            
+            /* Vidas centralizadas e menores */
+            #lives-display { 
+                top: 10px !important; 
+                left: 50% !important; 
+                transform: translateX(-50%); /* Centraliza */
+                right: auto !important; /* Remove alinhamento a direita */
+                gap: 2px !important;
+            }
+            .heart-icon { font-size: 20px !important; }
+            
+            /* Recorde menor */
+            #high-score-display { bottom: 10px !important; left: 15px !important; font-size: 12px !important; }
+        }
+
+        canvas { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+
+        /* UI ELEMENTS */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 20;
+            transition: opacity 0.2s;
+        }
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
+
+        h1 {
+            font-family: 'Black Ops One', cursive;
+            font-size: clamp(30px, 8vw, 80px); 
+            background: linear-gradient(to bottom, #FFD700, #FF8C00);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(4px 4px 0 #000);
+            margin-bottom: 20px; text-transform: uppercase; text-align: center;
+            animation: floatTitle 3s ease-in-out infinite;
+        }
+        @keyframes floatTitle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .btn {
+            background: linear-gradient(180deg, #4CAF50, #2E7D32);
+            border: 4px solid #fff; color: white; padding: 15px 40px;
+            font-size: clamp(16px, 4vw, 24px); font-weight: 900; border-radius: 50px;
+            margin: 8px; cursor: pointer; box-shadow: 0 8px 0 #1b5e20;
+            min-width: 180px; text-align: center; text-transform: uppercase;
+            transition: all 0.1s; font-family: 'Fredoka', sans-serif;
+        }
+        .btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #1b5e20; }
+        .btn:hover { filter: brightness(1.2); }
+        .btn-secondary { background: linear-gradient(180deg, #2196F3, #1565C0); box-shadow: 0 8px 0 #0D47A1; }
+        .btn-secondary:active { box-shadow: 0 2px 0 #0D47A1; }
+        .btn-danger { background: linear-gradient(180deg, #F44336, #C62828); box-shadow: 0 8px 0 #8E0000; }
+        .btn-danger:active { box-shadow: 0 2px 0 #8E0000; }
+
+        /* Icon Buttons Top Right */
+        .icon-btn-container {
+            position: absolute; top: 25px; right: 25px; z-index: 50;
+            display: flex; gap: 15px;
+        }
+        .icon-btn {
+            background: rgba(0,0,0,0.6); border: 3px solid rgba(255,255,255,0.7);
+            color: white; width: 50px; height: 50px; border-radius: 12px;
+            cursor: pointer; font-size: 26px; display: flex; justify-content: center; align-items: center;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn:hover { background: rgba(0,0,0,0.9); border-color: #fff; }
+
+        /* HUD */
+        #hud-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: none; z-index: 10; }
+        
+        #score-container { 
+            position: absolute; 
+            top: 40px; left: 40px; 
+            display: flex; flex-direction: column; align-items: flex-start; 
+        }
+        #score-label { 
+            font-size: 16px; font-weight: 900; color: #FFD700; 
+            text-shadow: 2px 2px 0 #000; margin-bottom: -5px; letter-spacing: 1px; 
+        }
+        #score-display { 
+            font-family: 'Black Ops One', cursive; 
+            font-size: clamp(40px, 8vw, 70px); color: #fff; 
+            text-shadow: 4px 4px 0 #000; line-height: 1; 
+            transition: transform 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pop-score { transform: scale(1.4) rotate(-5deg) !important; color: #76ff03 !important; text-shadow: 0 0 30px #76ff03, 6px 6px 0 #000 !important; }
+
+        #combo-bar-container {
+            width: clamp(120px, 20vw, 300px); height: 10px; background: rgba(0,0,0,0.7); margin-top: 5px;
+            border-radius: 10px; overflow: hidden; border: 2px solid #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+        }
+        #combo-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #FFD700, #FF4500); transition: width 0.1s linear; }
+        #combo-text { 
+            font-size: 16px; font-weight: 900; color: #FFD700; margin-top: 5px; 
+            text-shadow: 2px 2px 0 #000; opacity: 0; font-style: italic; transition: opacity 0.2s;
+        }
+        
+        #lives-display { 
+            position: absolute; top: 40px; right: 100px; /* Padrão PC */
+            display: flex; gap: 5px; 
+        }
+        .heart-icon { font-size: clamp(24px, 4vw, 40px); filter: drop-shadow(3px 3px 0 #000); transition: transform 0.2s; }
+        .heart-lost { filter: grayscale(100%) opacity(0.5); transform: scale(0.8); }
+
+        #high-score-display { 
+            position: absolute; bottom: 30px; left: 40px; 
+            font-size: 18px; color: rgba(255,255,255,0.9); font-weight: bold; text-shadow: 2px 2px 0 #000; 
+        }
+
+        /* MODAL */
+        #modal-screen { z-index: 30; }
+        #modal-msg { background: #1a1a1a; padding: 30px; border-radius: 20px; border: 4px solid #FFD700; text-align: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.3); min-width: 300px; max-width: 90%; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; max-height: 50vh; overflow-y: auto; }
+        .option-card { background: #333; border: 3px solid #555; border-radius: 15px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: all 0.2s; }
+        .option-card:hover { background: #444; transform: translateY(-3px); }
+        .option-card.selected { border-color: #76ff03; background: #2e3b23; box-shadow: 0 0 15px #76ff03; }
+        .option-icon { font-size: 35px; margin-bottom: 5px; }
+        .option-name { font-weight: bold; font-size: 12px; color: #fff; text-transform: uppercase; }
+
+        /* FX */
+        #fx-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .flash-red { animation: flashRed 0.2s; } .flash-white { animation: flashWhite 1.0s; } .flash-green { animation: flashGreen 0.3s; }
+        .flash-blue { animation: flashBlue 0.4s; }
+        @keyframes flashRed { 0% { background: rgba(255,0,0,0.4); } 100% { background: transparent; } }
+        @keyframes flashWhite { 0% { background: white; } 100% { background: transparent; } }
+        @keyframes flashGreen { 0% { background: rgba(118, 255, 3, 0.2); } 100% { background: transparent; } }
+        @keyframes flashBlue { 0% { background: rgba(0, 191, 255, 0.3); } 100% { background: transparent; } }
+
+        #rotate-message { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; }
+        @media screen and (max-width: 768px) and (orientation: portrait) { #rotate-message { display: flex; } }
+    </style>
+</head>
+<body>
+
+    <div id="rotate-message"><h1>🔄</h1><p>Gire o celular!</p></div>
+
+    <div id="game-wrapper">
+        <div class="icon-btn-container">
+            <div id="pause-btn" class="icon-btn" title="Pausar (ESC)">⏸️</div>
+            <div id="fullscreen-btn" class="icon-btn" title="Tela Cheia">⛶</div>
+        </div>
+        
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+        <div id="fx-overlay"></div>
+
+        <!-- HUD -->
+        <div id="hud-layer">
+            <div id="score-container">
+                <div id="score-label">PIB ATUAL</div>
+                <div id="score-display">0</div>
+                <div id="combo-bar-container"><div id="combo-bar"></div></div>
+                <div id="combo-text">COMBO MAX!</div>
+            </div>
+            <div id="lives-display"></div> <!-- Vidas -->
+            <div id="high-score-display">RECORDE: 0</div>
+        </div>
+
+        <!-- MENU PRINCIPAL -->
+        <div id="menu-screen" class="screen">
+            <h1>CAPIVARA<br><span style="font-size:0.5em; color:#fff; font-family:'Fredoka',sans-serif;">GEOPOLÍTICA</span></h1>
+            <button class="btn" onclick="Game.start()">JOGAR AGORA</button>
+            <div style="margin-top:15px; display: flex; gap: 15px;">
+                <button class="btn btn-secondary" style="min-width:130px" onclick="UI.openModal('skins')">SKINS</button>
+                <button class="btn btn-secondary" style="min-width:130px" onclick="UI.openModal('maps')">MAPAS</button>
+            </div>
+            <p style="margin-top:30px; font-size:16px; opacity:0.8; font-weight:bold; color:#FFD700;">PC: Setas / Mobile: Toque Lados</p>
+        </div>
+
+        <!-- TELA DE PAUSA -->
+        <div id="pause-screen" class="screen hidden">
+            <h1 style="color:#fff;">PAUSADO</h1>
+            <button class="btn" onclick="Game.resume()">CONTINUAR</button>
+            <button class="btn btn-danger" onclick="Game.menu()">SAIR</button>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="gameover-screen" class="screen hidden">
+            <h1 style="color:#ff4444; font-size: 60px;">GAME OVER</h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; margin-bottom: 20px; text-align: center; min-width: 280px; border: 2px solid rgba(255,255,255,0.2);">
+                <p style="font-size: 16px; color: #aaa; margin:0; letter-spacing: 2px; font-weight:bold;">PIB FINAL</p>
+                <p style="font-size: 60px; color: #fff; font-family: 'Black Ops One'; margin: 5px 0;"> <span id="final-score">0</span> </p>
+                <hr style="border: 0; border-top: 2px dashed rgba(255,255,255,0.2); margin: 15px 0;">
+                <p style="font-size: 16px; color: #aaa; margin:0;">RECORDE</p>
+                <p style="font-size: 30px; color: #FFD700; font-weight: bold; margin: 5px 0;"> <span id="record-score">0</span> </p>
+            </div>
+            <button class="btn" onclick="Game.start()">REINICIAR</button>
+            <button class="btn btn-secondary" onclick="Game.menu()">MENU</button>
+        </div>
+
+        <!-- MODAL -->
+        <div id="modal-screen" class="screen hidden" onclick="UI.closeModal()">
+            <div id="modal-msg" onclick="event.stopPropagation()">
+                <h2 id="modal-title" style="color:#FFD700; margin:0; font-family: 'Black Ops One';">OPÇÕES</h2>
+                <div id="options-container" class="options-grid"></div>
+                <button class="btn btn-secondary" style="margin-top:25px;" onclick="UI.closeModal()">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= CONFIG =================
+        const config = { useImages: true, soundOn: true };
+
+        // ================= AUDIO SYSTEM =================
+        const AudioSys = {
+            sounds: {},
+            lastPlay: {},
+            
+            load: function() {
+                const list = {
+                    'eat': 'comer.mp3', 'boom': 'explosao.mp3', 'nuke': 'nuclear.mp3',
+                    'power': 'powerup.mp3', 'hurt': 'dano.mp3', 'over': 'gameover.mp3',
+                    'heal': 'powerup.mp3', 'pop': 'comer.mp3',
+                    'click': 'comer.mp3', 'shield_up': 'powerup.mp3', 'shield_break': 'explosao.mp3',
+                    'bgm': 'musica.mp3', 'bgm_sabara': 'musica_sabara.mp3', 'bgm_goiania': 'musica_goiania.mp3'
+                };
+                for(let k in list) {
+                    this.sounds[k] = new Audio(list[k]);
+                    if(k.includes('bgm')) { this.sounds[k].loop = true; this.sounds[k].volume = 0.4; }
+                }
+            },
+            
+            play: function(key, rate=1.0) {
+                if(!config.soundOn || !this.sounds[key]) return;
+                const now = Date.now();
+                if(this.lastPlay[key] && now - this.lastPlay[key] < 60) return;
+                this.lastPlay[key] = now;
+
+                const s = this.sounds[key];
+                if(key.includes('bgm')) {
+                    s.currentTime = 0; s.play().catch(()=>{});
+                } else {
+                    const clone = s.cloneNode();
+                    clone.volume = 0.6; clone.playbackRate = rate;
+                    clone.play().catch(()=>{});
+                }
+            },
+            
+            stop: function(key) { if(this.sounds[key]) { this.sounds[key].pause(); this.sounds[key].currentTime = 0; } },
+            stopAllMusic: function() { ['bgm', 'bgm_sabara', 'bgm_goiania'].forEach(k => this.stop(k)); }
+        };
+
+        // ================= ASSETS MANAGER =================
+        const Assets = {
+            images: {},
+            load: function() {
+                const names = [
+                    'capivara','capivara_brasil','capivara_pato','capivara_goiana',
+                    'background','background_brasil','background_sabara','background_goiania',
+                    'sushi','sushi_maki','sushi_ebi','sushi_temaki','pamonha',
+                    'globe','map','heart','bomb','missile','nuke','shield'
+                ];
+                names.forEach(n => { this.images[n] = new Image(); this.images[n].src = n + '.png'; });
+            },
+            
+            drawSprite: function(ctx, key, x, y, w, h, facingLeft=false) {
+                const img = this.images[key];
+                if (config.useImages && img && img.complete && img.naturalWidth > 0) {
+                    ctx.save();
+                    if(facingLeft) { ctx.translate(x + w, y); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, w, h); } 
+                    else { ctx.drawImage(img, x, y, w, h); }
+                    ctx.restore();
+                } else {
+                    // Fallback
+                    ctx.fillStyle = key.includes('bomb')||key.includes('missile') ? '#333' : 
+                                    key.includes('nuke') ? '#000' :
+                                    key.includes('heart') ? 'red' :
+                                    key.includes('shield') ? 'blue' :
+                                    key.includes('pamonha') ? '#FFD700' : 'orange';
+                    ctx.fillRect(x, y, w, h);
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+                }
+            }
+        };
+
+        // ================= GAME ENGINE =================
+        const Game = {
+            canvas: document.getElementById('gameCanvas'),
+            ctx: document.getElementById('gameCanvas').getContext('2d', {alpha: false}),
+            state: 'MENU',
+            score: 0, displayScore: 0, lives: 5, combo: 0, frame: 0,
+            width: 960, height: 540,
+            
+            items: [], particles: [], texts: [], shockwaves: [], areaExplosions: [],
+            player: { x: 440, y: 460, w: 80, h: 60, vx: 0, speed: 2.0, friction: 0.85, invuln: 0, sx: 1, sy: 1, hasShield: false },
+            powerup: { type: null, timer: 0 },
+            activeNuke: false,
+            skin: 'capivara', bg: 'background', music: 'bgm',
+            
+            init: function() {
+                Assets.load();
+                AudioSys.load();
+                
+                window.addEventListener('keydown', e => this.input(e.key, true));
+                window.addEventListener('keyup', e => this.input(e.key, false));
+                this.canvas.addEventListener('touchstart', e => this.touch(e, true), {passive:false});
+                this.canvas.addEventListener('touchend', e => this.touch(e, false));
+                
+                document.getElementById('fullscreen-btn').onclick = this.toggleFullscreen;
+                document.getElementById('pause-btn').onclick = () => this.togglePause();
+
+                this.loop();
+            },
+            
+            keys: {left:false, right:false},
+            
+            input: function(k, down) {
+                if(k==='ArrowLeft'||k==='a') this.keys.left = down;
+                if(k==='ArrowRight'||k==='d') this.keys.right = down;
+                if(down) {
+                    if(k==='Escape') this.togglePause();
+                    if(k===' ' && (this.state==='MENU'||this.state==='GAMEOVER')) this.start();
+                }
+            },
+            
+            touch: function(e, down) {
+                if(e.type!=='touchend') e.preventDefault();
+                if(!down) { this.keys.left=false; this.keys.right=false; return; }
+                if(this.state !== 'PLAYING') return;
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.touches[0].clientX - rect.left;
+                if(x < rect.width/2) this.keys.left = true; else this.keys.right = true;
+            },
+            
+            toggleFullscreen: function() {
+                const b = document.body;
+                if(!document.fullscreenElement) { b.requestFullscreen().catch(()=>{}); b.classList.add('fullscreen'); }
+                else { document.exitFullscreen(); b.classList.remove('fullscreen'); }
+            },
+
+            togglePause: function() {
+                if(this.state === 'PLAYING') {
+                    this.state = 'PAUSED';
+                    UI.show('pause');
+                    AudioSys.sounds[this.music].volume = 0.1; 
+                } else if(this.state === 'PAUSED') {
+                    this.resume();
+                }
+            },
+
+            resume: function() {
+                this.state = 'PLAYING';
+                UI.show('hud');
+                AudioSys.sounds[this.music].volume = 0.4;
+            },
+            
+            start: function() {
+                this.reset();
+                UI.show('hud');
+                this.state = 'PLAYING';
+                AudioSys.stopAllMusic();
+                AudioSys.play(this.music);
+            },
+            
+            menu: function() {
+                this.state = 'MENU';
+                UI.show('menu');
+                AudioSys.stopAllMusic();
+            },
+            
+            reset: function() {
+                this.score = 0; this.displayScore = 0; this.lives = 5; this.combo = 0;
+                this.items = []; this.particles = []; this.texts = []; this.areaExplosions = [];
+                this.player.x = this.width/2 - this.player.w/2; this.player.vx = 0; this.player.invuln = 0;
+                this.player.hasShield = false;
+                this.activeNuke = false;
+                UI.updateHUD(); UI.updateScore(0);
+            },
+            
+            spawn: function() {
+                let r = Math.random(), type='sushi';
+                if(r<0.4) type='sushi'; else if(r<0.7) type='sushi_maki'; else type='sushi_temaki';
+                
+                if(Math.random()>0.95) {
+                    let p = Math.random();
+                    if(p < 0.33) type='globe'; else if(p < 0.66) type='map'; else type='shield';
+                }
+                if(Math.random()>0.985) type = 'heart';
+                
+                // PAMONHA (Goiânia Exclusive)
+                if(this.bg === 'background_goiania' && Math.random() < 0.08) type = 'pamonha';
+
+                let dangerCap = Math.min(this.score*0.0005, 0.45);
+                if(Math.random() < 0.12 + dangerCap) {
+                    type = Math.random()<0.5?'bomb':'missile';
+                    if(this.score>60 && !this.activeNuke && Math.random()<0.08) { 
+                        type='nuke'; this.activeNuke=true; 
+                        this.spawnText(this.width/2, 200, "⚠️ NUCLEAR ⚠️", "#FFFF00", 35);
+                        AudioSys.play('nuke'); 
+                    }
+                }
+                
+                let s=40; 
+                if(type==='globe'||type==='nuke'||type==='shield') s=60;
+                if(type==='missile') s=50; // Maior
+                if(type==='pamonha') s=65; // Maior
+
+                let spd = 3 + Math.random()*3 + (this.score*0.015);
+                if(type==='nuke') spd = 2.0; 
+                if(type==='missile') spd = 7+Math.random()*2;
+                if(type==='pamonha') spd = 4;
+
+                this.items.push({ 
+                    x: Math.random()*(this.width-s), y: -s, w: s, h: s,
+                    type: type, vy: spd, angle: 0, 
+                    rot: (type==='missile'||type==='nuke')?0:(Math.random()-0.5)*0.1,
+                    osc: Math.random()*Math.PI*2
+                });
+            },
+            
+            update: function() {
+                if(this.state !== 'PLAYING') return;
+                this.frame++;
+
+                if(this.keys.left) this.player.vx -= this.player.speed;
+                if(this.keys.right) this.player.vx += this.player.speed;
+                this.player.vx *= this.player.friction; this.player.x += this.player.vx;
+                if(this.player.x<0){this.player.x=0;this.player.vx=0;} if(this.player.x>this.width-this.player.w){this.player.x=this.width-this.player.w;this.player.vx=0;}
+                if(this.player.invuln>0) this.player.invuln--;
+                
+                this.player.sx += (1 - this.player.sx) * 0.1;
+                this.player.sy += (1 - this.player.sy) * 0.1;
+
+                let rate = Math.max(15, 50 - Math.floor(this.score/8));
+                if(this.frame % rate === 0) this.spawn();
+
+                if(this.powerup.timer > 0) {
+                    this.powerup.timer--;
+                    if(this.powerup.type === 'globe') {
+                        this.items.forEach(i => {
+                            if(!['bomb','missile','nuke'].includes(i.type)) {
+                                i.x += (this.player.x - i.x) * 0.08; i.y += (this.player.y - i.y) * 0.08;
+                            }
+                        });
+                    }
+                } else this.powerup.type = null;
+
+                for(let i=this.items.length-1; i>=0; i--) {
+                    let it = this.items[i];
+                    it.y += it.vy; it.angle += it.rot;
+                    if(!['missile','nuke','bomb'].includes(it.type)) it.x += Math.sin(this.frame*0.05 + it.osc)*1.5;
+                    
+                    if(this.collide(this.player, it)) {
+                        this.hit(it); this.items.splice(i, 1); continue;
+                    }
+                    if(it.y > this.height) {
+                        if(it.type === 'nuke') this.triggerNuke(it.x);
+                        this.items.splice(i, 1);
+                    }
+                }
+                
+                for(let i=this.areaExplosions.length-1; i>=0; i--) {
+                    let ex = this.areaExplosions[i];
+                    if(ex.r < ex.maxR) ex.r += 8; ex.life--;
+                    if(this.player.invuln<=0 && this.dist(this.player, ex) < ex.r) {
+                        this.takeDamage(1); 
+                        this.spawnText(this.player.x, this.player.y-60, "RADIAÇÃO!", "#ADFF2F");
+                    }
+                    if(ex.life<=0) this.areaExplosions.splice(i,1);
+                }
+                
+                this.updateParticles();
+                
+                if(this.displayScore < this.score) {
+                    this.displayScore += Math.ceil((this.score - this.displayScore) * 0.2);
+                    UI.updateScore(this.displayScore, true);
+                } else UI.removePop();
+
+                if(this.frame % 60 === 0 && this.combo > 0) { this.combo--; UI.updateHUD(); }
+                if(this.shake>0) { let dx=(Math.random()-0.5)*this.shake; let dy=(Math.random()-0.5)*this.shake; this.canvas.style.transform = `translate(${dx}px, ${dy}px)`; this.shake--; } else { this.canvas.style.transform='none'; }
+                if(this.lives <= 0) this.gameOver();
+            },
+            
+            hit: function(it) {
+                if(['bomb','missile','nuke'].includes(it.type)) {
+                    if(this.player.invuln > 0) return;
+                    
+                    if(this.player.hasShield && it.type !== 'nuke') {
+                        this.player.hasShield = false;
+                        this.player.invuln = 40;
+                        AudioSys.play('shield_break');
+                        UI.flash('blue');
+                        this.spawnText(this.player.x, this.player.y, "BLOQUEADO!", "#00BFFF", 25);
+                        return;
+                    }
+
+                    this.player.sy = 0.6; this.player.sx = 1.4;
+                    if(it.type==='nuke') { this.triggerNuke(it.x); this.activeNuke=false; this.lives -= 2; }
+                    else {
+                        this.takeDamage(1); 
+                        this.createExplosion(it.x, it.y, '#555');
+                        AudioSys.play('boom'); 
+                        UI.flash('red');
+                    }
+                } 
+                else if(it.type === 'heart') {
+                    if(this.lives < 5) this.lives++;
+                    AudioSys.play('heal'); UI.updateLives(this.lives); UI.flash('green');
+                    this.spawnText(this.player.x, this.player.y, "+1 VIDA", "#ff0000", 30);
+                }
+                else if(it.type === 'shield') {
+                    this.player.hasShield = true;
+                    AudioSys.play('shield_up'); UI.flash('blue');
+                    this.spawnText(this.player.x, this.player.y, "ESCUDO!", "#00BFFF", 30);
+                }
+                else {
+                    this.combo++;
+                    let pts = 1;
+                    if(it.type.includes('maki')) pts=2;
+                    if(it.type.includes('temaki')) pts=5;
+                    if(it.type==='pamonha') pts=100;
+                    if(it.type==='map') { pts=20; this.powerup={type:'map',timer:400}; AudioSys.play('power'); }
+                    if(it.type==='globe') { pts=50; this.powerup={type:'globe',timer:400}; AudioSys.play('power'); }
+                    if(this.powerup.type==='map') pts *= 2;
+                    
+                    this.score += pts;
+                    AudioSys.play('eat', 1.0 + Math.min(this.combo*0.05, 0.5));
+                    
+                    let col = it.type==='pamonha' ? '#FFFF00' : (pts>10?'#FFD700':'#FFF');
+                    let msg = it.type==='pamonha' ? "PAMONHA!" : `+${pts}`;
+                    
+                    this.spawnParticles(it.x, it.y, col);
+                    this.spawnText(this.player.x, this.player.y, msg, col, it.type==='pamonha'?30:20);
+                    
+                    this.player.sy = 0.7; this.player.sx = 1.3;
+                    UI.updateHUD();
+                }
+            },
+            
+            takeDamage: function(qtd) {
+                this.lives-=qtd; this.combo=0; this.player.invuln=60; this.shake=20;
+                UI.updateHUD(); AudioSys.play('hurt');
+            },
+
+            triggerNuke: function(x) {
+                UI.flash('white'); AudioSys.play('boom');
+                this.items = []; this.activeNuke = false;
+                this.areaExplosions.push({x:x, y:this.height-20, r:10, maxR:350, life:120});
+            },
+            
+            collide: function(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; },
+            dist: function(p, ex) { let dx=(p.x+p.w/2)-ex.x; let dy=(p.y+p.h/2)-ex.y; return Math.sqrt(dx*dx + dy*dy); },
+            
+            createExplosion: function(x, y, color) {
+                for(let i=0; i<12; i++) this.particles.push({x:x, y:y, vx:(Math.random()-0.5)*12, vy:(Math.random()-0.5)*12, life:1, color:color});
+            },
+            spawnParticles: function(x, y, color) {
+                for(let i=0; i<8; i++) this.particles.push({x:x, y:y, vx:(Math.random()-0.5)*10, vy:(Math.random()-0.5)*10, life:1, color:color});
+            },
+            spawnText: function(x, y, txt, color, size=20) { this.texts.push({x,y,txt,color,size,life:60}); },
+            
+            updateParticles: function() {
+                if(this.particles.length > 80) this.particles.splice(0, 10);
+                for(let i=this.particles.length-1; i>=0; i--) {
+                    let p = this.particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.5; p.life-=0.05;
+                    if(p.life<=0) this.particles.splice(i,1);
+                }
+                for(let i=this.texts.length-1; i>=0; i--) {
+                    let t = this.texts[i]; t.y-=2; t.life--;
+                    if(t.life<=0) this.texts.splice(i,1);
+                }
+            },
+
+            draw: function() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                Assets.drawSprite(this.ctx, this.bg, 0, 0, this.width, this.height);
+                
+                this.areaExplosions.forEach(ex => {
+                    let g = this.ctx.createRadialGradient(ex.x, ex.y, 0, ex.x, ex.y, ex.r);
+                    g.addColorStop(0, 'rgba(255,200,0,0.8)'); g.addColorStop(1, 'rgba(255,0,0,0)');
+                    this.ctx.fillStyle=g; this.ctx.beginPath(); this.ctx.arc(ex.x, ex.y, ex.r, Math.PI, 0); this.ctx.fill();
+                });
+
+                if(this.player.invuln % 10 < 5) {
+                    let w = this.player.w * this.player.sx; let h = this.player.h * this.player.sy;
+                    let x = this.player.x + (this.player.w - w)/2; let y = this.player.y + (this.player.h - h);
+                    Assets.drawSprite(this.ctx, this.skin, x, y, w, h, this.player.vx < 0);
+                }
+                
+                if(this.player.hasShield) {
+                    this.ctx.save(); this.ctx.translate(this.player.x+40, this.player.y+30);
+                    let s = 1 + Math.sin(this.frame*0.1)*0.05; this.ctx.scale(s,s);
+                    this.ctx.strokeStyle = '#00BFFF'; this.ctx.lineWidth = 4;
+                    this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#00BFFF';
+                    this.ctx.beginPath(); this.ctx.arc(0,0, 55, 0, Math.PI*2); this.ctx.stroke();
+                    this.ctx.restore();
+                }
+
+                if(this.powerup.type) {
+                    let pulse = Math.sin(this.frame * 0.2) * 5;
+                    this.ctx.save(); this.ctx.translate(this.player.x+40, this.player.y+30);
+                    this.ctx.strokeStyle = this.powerup.type==='globe'?'#00ccff':'#8bc34a'; 
+                    this.ctx.lineWidth = 4; this.ctx.beginPath(); this.ctx.arc(0,0, 65 + pulse, 0, Math.PI*2); this.ctx.stroke();
+                    this.ctx.restore();
+                }
+
+                this.items.forEach(it => {
+                    Assets.drawSprite(this.ctx, it.type, it.x, it.y, it.w, it.h);
+                });
+                
+                this.particles.forEach(p => {
+                    this.ctx.globalAlpha = p.life; this.ctx.fillStyle = p.color;
+                    this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 4, 0, Math.PI*2); this.ctx.fill();
+                    this.ctx.globalAlpha = 1;
+                });
+                
+                this.texts.forEach(t => {
+                    this.ctx.fillStyle = t.color; this.ctx.strokeStyle = 'black'; this.ctx.lineWidth = 3;
+                    this.ctx.font = `900 ${t.size}px Arial`;
+                    this.ctx.strokeText(t.txt, t.x, t.y); this.ctx.fillText(t.txt, t.x, t.y);
+                });
+            },
+            
+            loop: function() {
+                if(this.state === 'PLAYING') this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            },
+
+            gameOver: function() {
+                try {
+                    this.state='GAMEOVER'; document.getElementById('final-score').innerText=this.score;
+                    try { if(this.score>highScore) { highScore=this.score; localStorage.setItem('capyHighScore', highScore); } } catch(e){}
+                    document.getElementById('record-score').innerText=highScore;
+                    UI.show('gameover'); AudioSys.stopAllMusic(); AudioSys.play('over');
+                } catch(e) { console.error(e); UI.show('gameover'); }
+            }
+        };
+
+        // ================= UI MANAGER =================
+        const UI = {
+            show: function(screen) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+                document.getElementById('hud-layer').style.display = 'none';
+                if(screen === 'menu') document.getElementById('menu-screen').classList.remove('hidden');
+                if(screen === 'gameover') document.getElementById('gameover-screen').classList.remove('hidden');
+                if(screen === 'pause') document.getElementById('pause-screen').classList.remove('hidden');
+                if(screen === 'hud') document.getElementById('hud-layer').style.display = 'block';
+            },
+            
+            updateScore: function(val, pop=false) {
+                const el = document.getElementById('score-display');
+                el.innerText = val;
+                if(pop) { el.classList.remove('pop-score'); void el.offsetWidth; el.classList.add('pop-score'); }
+            },
+            
+            removePop: function() { document.getElementById('score-display').classList.remove('pop-score'); },
+            
+            updateLives: function(val) {
+                const container = document.getElementById('lives-display');
+                container.innerHTML = '';
+                for(let i=0; i<5; i++) {
+                    const heart = document.createElement('span');
+                    heart.className = 'heart-icon';
+                    heart.innerText = '❤️';
+                    if(i >= val) heart.classList.add('heart-lost');
+                    container.appendChild(heart);
+                }
+            },
+            
+            updateHUD: function() {
+                this.updateLives(Game.lives);
+                let pct = Math.min(Game.combo * 5, 100);
+                document.getElementById('combo-bar').style.width = pct + '%';
+                const txt = document.getElementById('combo-text');
+                txt.innerText = `COMBO X${Game.combo}!`;
+                txt.style.opacity = Game.combo > 2 ? 1 : 0;
+            },
+            
+            flash: function(type) {
+                const fx = document.getElementById('fx-overlay');
+                fx.className = type === 'red' ? 'flash-red' : (type === 'green' ? 'flash-green' : (type === 'blue' ? 'flash-blue' : 'flash-white'));
+                setTimeout(() => fx.className = '', 300);
+            },
+            
+            openModal: function(type) {
+                const grid = document.querySelector('.options-grid');
+                const title = document.getElementById('modal-title');
+                grid.innerHTML = '';
+                document.getElementById('modal-screen').classList.remove('hidden');
+                
+                if(type === 'skins') {
+                    title.innerText = "ESCOLHA A SKIN";
+                    this.addOpt(grid, 'Terno', '🕴️', 'capivara', true);
+                    this.addOpt(grid, 'Brasil', '🇧🇷', 'capivara_brasil', true);
+                    this.addOpt(grid, 'Pato', '🦆', 'capivara_pato', true);
+                    this.addOpt(grid, 'Goiana', '🤠', 'capivara_goiana', true);
+                } else {
+                    title.innerText = "ESCOLHA O MAPA";
+                    this.addOpt(grid, 'Céu Azul', '☁️', 'background', false);
+                    this.addOpt(grid, 'Maringá-PR', '🌳', 'background_brasil', false);
+                    this.addOpt(grid, 'Sabará-MG', '⛪', 'background_sabara', false);
+                    this.addOpt(grid, 'Goiânia-GO', '🏙️', 'background_goiania', false);
+                }
+            },
+            
+            addOpt: function(parent, name, icon, key, isSkin) {
+                const div = document.createElement('div');
+                div.className = 'option-card ' + (isSkin ? (Game.skin===key?'selected':'') : (Game.bg===key?'selected':''));
+                div.innerHTML = `<div class="option-icon">${icon}</div><div class="option-name">${name}</div>`;
+                div.onclick = () => {
+                    if(isSkin) Game.skin = key;
+                    else { 
+                        Game.bg = key; 
+                        Game.music = (key==='background') ? 'bgm' : 
+                                     (key==='background_sabara') ? 'bgm_sabara' :
+                                     (key==='background_goiania') ? 'bgm_goiania' : 'bgm';
+                    }
+                    AudioSys.play('pop'); this.closeModal();
+                };
+                parent.appendChild(div);
+            },
+            
+            closeModal: function() { document.getElementById('modal-screen').classList.add('hidden'); }
+        };
+
+        // START
+        let highScore = 0;
+        try { highScore = localStorage.getItem('capyHighScore') || 0; } catch(e) {}
+        document.getElementById('high-score-display').innerText = `RECORDE: ${highScore}`;
+        
+        Game.init();
+
+    </script>
+</body>
+</html>
