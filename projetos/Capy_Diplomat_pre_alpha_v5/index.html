@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Capivara Sushi: Ultimate Fixed</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Fredoka:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="rotate-message"><h1>🔄</h1><p>Gire o celular!</p></div>
+
+    <div id="game-wrapper">
+        
+        <div id="game-background"></div>
+
+        <div id="goiania-sun" class="hidden">
+            <div class="sun-flare"></div>     <div class="sun-flare two"></div> <div class="sun-core"></div>      </div>
+
+        <div id="weather-container"></div>
+
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+        
+        <div id="fx-overlay"></div>
+
+        <div id="pause-btn" class="icon-btn" title="Pausar (ESC)">⏸️</div>
+        <div class="icon-btn-container">
+            <div id="fullscreen-btn" class="icon-btn" title="Tela Cheia">⛶</div>
+        </div>
+        
+        <div id="hud-layer">
+            <div id="hud-top-bar">
+                <div id="score-group">
+                    <div id="score-label">PIB ATUAL</div>
+                    <div id="score-display">0</div>
+                    <div id="combo-container">
+                        <div id="combo-bar-bg"><div id="combo-bar"></div></div>
+                        <div id="combo-text">SUPER MODE!</div>
+                    </div>
+                </div>
+                <div id="lives-display"></div> 
+            </div>
+            <div id="high-score-display">RECORDE: 0</div>
+            <div id="super-mode-msg" class="hidden">INVENCÍVEL!</div>
+        </div>
+
+        <div id="menu-screen" class="screen">
+            
+            <div class="menu-content-row">
+                <img src="capivara_menu_art.png" id="menu-mascot-art" alt="Capivara Art" onerror="this.style.display='none'">
+                
+                <div class="main-title">
+                    <span class="title-line1">CAPIVARA</span>
+                    <span class="title-line2">GEOPOLÍTICA</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-pulse" onclick="Game.start()" onmouseenter="AudioSys.play('menu_move')">JOGAR AGORA</button>
+            
+            <div class="menu-buttons-row">
+                <button class="btn btn-secondary" onclick="UI.openModal('skins')" onmouseenter="AudioSys.play('menu_move')">SKINS</button>
+                <button class="btn btn-secondary" onclick="UI.openModal('maps')" onmouseenter="AudioSys.play('menu_move')">MAPAS</button>
+            </div>
+            
+            <p class="controls-hint">PC: Setas + Shift &nbsp;|&nbsp; Mobile: Toque Lados</p>
+        </div>
+
+        <div id="pause-screen" class="screen hidden">
+            <h1 class="screen-title">PAUSADO</h1>
+            <button class="btn btn-primary" onclick="Game.resume()">CONTINUAR</button>
+            <button class="btn btn-danger" onclick="Game.menu()">SAIR</button>
+        </div>
+
+        <div id="gameover-screen" class="screen hidden">
+            <h1 class="gameover-title">GAME OVER</h1>
+            
+            <div class="score-card">
+                <p class="score-card-label">PIB FINAL</p>
+                <p class="score-card-value"><span id="final-score">0</span></p>
+                <div class="score-divider"></div>
+                <p class="score-card-label-small">RECORDE</p>
+                <p class="score-card-value-small"><span id="record-score">0</span></p>
+            </div>
+            
+            <div class="gameover-buttons-row">
+                <button class="btn btn-primary" onclick="Game.start()" onmouseenter="AudioSys.play('menu_move')">REINICIAR</button>
+                <button class="btn btn-secondary" onclick="Game.menu()" onmouseenter="AudioSys.play('menu_move')">MENU</button>
+            </div>
+        </div>
+
+        <div id="modal-screen" class="screen hidden" onclick="UI.closeModal()">
+            <div id="modal-msg" onclick="event.stopPropagation()">
+                <h2 id="modal-title">OPÇÕES</h2>
+                <div id="options-container" class="options-carousel"></div>
+                <button class="btn btn-secondary close-btn" onclick="UI.closeModal()" onmouseenter="AudioSys.play('menu_move')">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
